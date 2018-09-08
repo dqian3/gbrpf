@@ -1,0 +1,17 @@
+Load data...
+Start training...
+Training until validation scores don't improve for 5 rounds.
+Iter   0, Train's L2: 0.3291008421, Valid's L2: 0.3353227663, Elapsed: 15.00 secs
+Iter   1, Train's L2: 0.1896628576, Valid's L2: 0.1995382005, Elapsed: 14.23 secs
+Iter   2, Train's L2: 0.1822866110, Valid's L2: 0.1974737516, Elapsed: 14.43 secs
+Iter   3, Train's L2: 0.1806321763, Valid's L2: 0.1969234791, Elapsed: 14.24 secs
+Iter   4, Train's L2: 0.1805879369, Valid's L2: 0.1972103247, Elapsed: 14.42 secs
+Iter   5, Train's L2: 0.1805258606, Valid's L2: 0.1972030800, Elapsed: 14.41 secs
+Iter   6, Train's L2: 0.1805093872, Valid's L2: 0.1972029047, Elapsed: 14.47 secs
+Iter   7, Train's L2: 0.1805042767, Valid's L2: 0.1972021038, Elapsed: 14.37 secs
+Iter   8, Train's L2: 0.1805027563, Valid's L2: 0.1972018737, Elapsed: 14.47 secs
+Early stopping, best iteration is:
+Iter   3, Train's L2: 0.1969234791
+Training finished. Elapsed: 130.05 secs
+Start predicting...
+The rmse of prediction is: 0.444380188121
