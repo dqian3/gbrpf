@@ -17,7 +17,7 @@ try:
 		LARGE_NUMBER = sys.maxint
 except ImportError:
 		# For python3
-		LARGE_NUMBER = sys.maxsize
+		LARGE_NUMBER = 9999999999999999999
 
 import numpy as np
 np.random.seed(0)

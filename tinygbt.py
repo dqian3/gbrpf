@@ -17,7 +17,7 @@ try:
     LARGE_NUMBER = sys.maxint
 except ImportError:
     # For python3
-    LARGE_NUMBER = sys.maxsize
+    LARGE_NUMBER = 9999999999999999999
 
 import numpy as np
 from sklearn.preprocessing import normalize
@@ -40,18 +40,17 @@ class Dataset(object):
         #     for j in range(X.shape[0]):
         #         #X[j][i] /= rmse
         #         pass
-        for i in range(X.shape[1]):
-            min_feat = 9999999
-            max_feat = -9999999
-            for j in range(X.shape[0]):
-                if X[j][i] > max_feat:
-                    max_feat = X[j][i]
-                if X[j][i] < min_feat:
-                    min_feat = X[j][i]
-            for j in range(X.shape[0]):
-                X[j][i] -= min_feat
-                X[j][i] /= (max_feat - min_feat)
-        print(X)
+        # for i in range(X.shape[1]):
+        #     min_feat = 9999999
+        #     max_feat = -9999999
+        #     for j in range(X.shape[0]):
+        #         if X[j][i] > max_feat:
+        #             max_feat = X[j][i]
+        #         if X[j][i] < min_feat:
+        #             min_feat = X[j][i]
+        #     for j in range(X.shape[0]):
+        #         X[j][i] -= min_feat
+        #         X[j][i] /= (max_feat - min_feat)
         self.X = X
         self.y = y
 

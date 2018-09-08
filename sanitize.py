@@ -12,10 +12,12 @@ if (len(sys.argv) != 3):
 train = pd.read_csv(sys.argv[1], sep=',')
 test = pd.read_csv(sys.argv[2], sep=',')
 train = train.drop('Id', axis=1)
+test = train.drop('Id', axis=1)
 
 train_len= len(train)
 
 df = pd.concat(objs=[train, test], axis=0)
+print (df)
 
 df = df.fillna(df.mean())
 dropped = df.loc[:,df.columns[-1]]
