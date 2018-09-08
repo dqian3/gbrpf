@@ -22,7 +22,6 @@ except ImportError:
 import numpy as np
 from sklearn.preprocessing import normalize
 np.random.seed(0)
-print("Seeded")
 
 class Dataset(object):
     def __init__(self, X, y):
