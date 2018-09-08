@@ -6,18 +6,14 @@ import numpy as np
 
 print(sys.argv)
 
-if (len(sys.argv) != 3):
+if (len(sys.argv) != 2):
 	raise Exception('No trainset file/output provided')
 
-train = pd.read_csv(sys.argv[1], sep=',')
-test = pd.read_csv(sys.argv[2], sep=',')
-train = train.drop('Id', axis=1)
-test = train.drop('Id', axis=1)
+df = pd.read_csv(sys.argv[1], sep=',')
 
-train_len= len(train)
-
-df = pd.concat(objs=[train, test], axis=0)
 print (df)
+
+df = df.drop('ID', axis=1)
 
 df = df.fillna(df.mean())
 dropped = df.loc[:,df.columns[-1]]
@@ -28,8 +24,5 @@ print (df)
 df = pd.get_dummies(df)
 print (df)
 
-train_output = df[:train_len]
-test_output = df[train_len:]
 
-train_output.to_csv('sanitized_train.csv', sep='\t', header=False, index=False)
-test_output.to_csv('sanitized_test.csv', sep='\t', header=False, index=False)
+df.to_csv('sanitized_train.csv', sep='\t', header=False, index=False)

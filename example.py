@@ -3,13 +3,13 @@ from sklearn.metrics import mean_squared_error
 from sklearn.cross_validation import train_test_split
 import sys
 
-if (len(sys.argv) == 4 and sys.argv[3] == '-o'):
+if (len(sys.argv) == 3 and sys.argv[2] == '-o'):
 	from tinygbt_old import Dataset, GBT
 	print("Original GBT")
 else:
 	from tinygbt import Dataset, GBT
 	print("GB Projection Tree")
-	if (len(sys.argv) != 3):
+	if (len(sys.argv) != 2):
 		raise Exception('No input files provided')
 
 print('Load data...')

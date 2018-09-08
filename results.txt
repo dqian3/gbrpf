@@ -1,0 +1,8 @@
+tinygbt: 1.3847
+Ours: 1.3836
+
+tinygbt: 52206
+Ours: 49226
+
+tinygbt: 3.0232
+Ours: 2.829
