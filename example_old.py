@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.metrics import mean_squared_error
 
-from tinygbt import Dataset, GBT
+from tinygbt_old import Dataset, GBT
 import sys
 
 if (len(sys.argv) != 3):
