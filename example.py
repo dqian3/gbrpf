@@ -3,7 +3,6 @@ from sklearn.metrics import mean_squared_error
 
 from tinygbt import Dataset, GBT
 
-
 print('Load data...')
 df_train = pd.read_csv('./data/regression.train', header=None, sep='\t')
 df_test = pd.read_csv('./data/regression.test', header=None, sep='\t')
