@@ -20,7 +20,7 @@ except ImportError:
     LARGE_NUMBER = sys.maxsize
 
 import numpy as np
-
+np.random.seed(0)
 
 class Dataset(object):
     def __init__(self, X, y):
