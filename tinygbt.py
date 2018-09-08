@@ -20,10 +20,38 @@ except ImportError:
     LARGE_NUMBER = sys.maxsize
 
 import numpy as np
+from sklearn.preprocessing import normalize
 np.random.seed(0)
 
 class Dataset(object):
     def __init__(self, X, y):
+        # for i in range(X.shape[1]): # iterate through feature columns
+        #     feat_sum = 0
+        #     for j in range(X.shape[0]): # iterate through rows
+        #         feat_sum += X[j][i]
+        #     feat_avg = feat_sum / X.shape[0]
+
+        #     sse = 0
+        #     for j in range(X.shape[0]):
+        #         X[j][i] -= feat_avg
+        #         sse += (X[j][i]) ** 2
+        #     mse = sse / (X.shape[0] - 1)
+        #     rmse = sse ** 0.5
+        #     for j in range(X.shape[0]):
+        #         #X[j][i] /= rmse
+        #         pass
+        # for i in range(X.shape[1]):
+        #     min_feat = 9999999
+        #     max_feat = -9999999
+        #     for j in range(X.shape[0]):
+        #         if X[j][i] > max_feat:
+        #             max_feat = X[j][i]
+        #         if X[j][i] < min_feat:
+        #             min_feat = X[j][i]
+        #     for j in range(X.shape[0]):
+        #         X[j][i] -= min_feat
+        #         X[j][i] /= (max_feat - min_feat)
+        # print(X)
         self.X = X
         self.y = y
 
@@ -33,7 +61,7 @@ class TreeNode(object):
         self.is_leaf = False
         self.left_child = None
         self.right_child = None
-        self.split_feature_id = None
+        self.split_coef_vector = None # Defines the linear combination for our projection tree.
         self.split_val = None
         self.weight = None
 
@@ -53,6 +81,9 @@ class TreeNode(object):
         """
         return np.sum(grad) / (np.sum(hessian) + lambd)
 
+    def _calc_linear_comb(self, coef_vector, instance):
+        return np.dot(coef_vector, instance)
+
     def build(self, instances, grad, hessian, shrinkage_rate, depth, param):
         """
         Exact Greedy Alogirithm for Split Finidng
@@ -67,12 +98,24 @@ class TreeNode(object):
         H = np.sum(hessian)
         best_gain = 0.
         best_feature_id = None
+        best_coef_vector = None
+        is_diagonal = False
+
         best_val = 0.
         best_left_instance_ids = None
         best_right_instance_ids = None
+
+        # Do one-hot vectors (one feature each, same as normal gbt)
         for feature_id in range(instances.shape[1]):
+            coef_vector = np.full(instances.shape[1], 0)
+            coef_vector[feature_id] = 1
+
+            # Stores results of lin comb of every row
+            dot_products = np.array([self._calc_linear_comb(coef_vector, instance) for instance in instances])
+
             G_l, H_l = 0., 0.
-            sorted_instance_ids = instances[:,feature_id].argsort()
+            #sorted_instance_ids = instances[:,feature_id].argsort()
+            sorted_instance_ids = dot_products.argsort()
             for j in range(sorted_instance_ids.shape[0]):
                 G_l += grad[sorted_instance_ids[j]]
                 H_l += hessian[sorted_instance_ids[j]]
@@ -81,15 +124,43 @@ class TreeNode(object):
                 current_gain = self._calc_split_gain(G, H, G_l, H_l, G_r, H_r, param['lambda'])
                 if current_gain > best_gain:
                     best_gain = current_gain
-                    best_feature_id = feature_id
-                    best_val = instances[sorted_instance_ids[j]][feature_id]
+                    #best_feature_id = feature_id
+                    best_coef_vector = coef_vector
+                    best_val = dot_products[sorted_instance_ids[j]]
                     best_left_instance_ids = sorted_instance_ids[:j+1]
                     best_right_instance_ids = sorted_instance_ids[j+1:]
+
+        # =======================================THIS IS OUR STUFF=========================================
+        # Try random linear combinations instead
+        for i in range(instances.shape[1] * 2):
+            coef_vector = np.random.rand(instances.shape[1])
+            #coef_vector = np.array([round(x) for x in coef_vector])
+            dot_products = np.array([self._calc_linear_comb(coef_vector, instance) for instance in instances])
+            G_l, H_l = 0., 0.
+            #sorted_instance_ids = instances[:,feature_id].argsort()
+            sorted_instance_ids = dot_products.argsort()
+            for j in range(sorted_instance_ids.shape[0]):
+
+                G_l += grad[sorted_instance_ids[j]]
+                H_l += hessian[sorted_instance_ids[j]]
+                G_r = G - G_l
+                H_r = H - H_l
+                current_gain = self._calc_split_gain(G, H, G_l, H_l, G_r, H_r, param['lambda'])
+                if current_gain > best_gain:
+                    best_gain = current_gain
+                    #best_feature_id = feature_id
+                    best_coef_vector = coef_vector
+                    best_val = dot_products[sorted_instance_ids[j]]
+                    best_left_instance_ids = sorted_instance_ids[:j+1]
+                    best_right_instance_ids = sorted_instance_ids[j+1:]
+
+        # =======================================THIS IS OUR STUFF=========================================
+
         if best_gain < param['min_split_gain']:
             self.is_leaf = True
             self.weight = self._calc_leaf_weight(grad, hessian, param['lambda']) * shrinkage_rate
         else:
-            self.split_feature_id = best_feature_id
+            self.split_coef_vector = best_coef_vector
             self.split_val = best_val
 
             self.left_child = TreeNode()
@@ -110,7 +181,7 @@ class TreeNode(object):
         if self.is_leaf:
             return self.weight
         else:
-            if x[self.split_feature_id] <= self.split_val:
+            if self._calc_linear_comb(self.split_coef_vector, x) <= self.split_val:
                 return self.left_child.predict(x)
             else:
                 return self.right_child.predict(x)
