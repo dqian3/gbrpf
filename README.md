@@ -1,1 +1,1 @@
-Started https://github.com/lancifollia/tinygbt
+Started from https://github.com/lancifollia/tinygbt
