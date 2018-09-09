@@ -2,6 +2,26 @@ import pandas as pd
 from sklearn.metrics import mean_squared_error
 
 from tinygbt import Dataset, GBT
+from graphviz import Digraph
+
+def print_node_with_children(tnode, g, name = "root"):
+    nodeName = name # + "\n" + str(tnode.split_val)
+    print(str(tnode.split_val))
+    print(tnode.split_coef_vector)
+    if tnode.is_leaf:
+        g.node(nodeName)
+    else:
+        nodeName += '\nCutoff ' + str(tnode.split_val) + '\n' + str(tnode.split_coef_vector)
+        g.node(nodeName)
+        child1 = print_node_with_children(tnode.left_child, g, name+"-left")
+        child2 = print_node_with_children(tnode.right_child, g, name+"-right")
+        if not tnode.left_child.is_leaf:
+            child1 += '\nCutoff ' + str(tnode.left_child.split_val) + '\n' + str(tnode.left_child.split_coef_vector)
+        if not tnode.right_child.is_leaf:
+            child2 += '\nCutoff ' + str(tnode.right_child.split_val) + '\n' + str(tnode.right_child.split_coef_vector)
+        g.edge(nodeName, str(child1))
+        g.edge(nodeName, str(child2))
+    return name
 
 print('Load data...')
 df_train = pd.read_csv('./data/regression.train', header=None, sep='\t')
@@ -29,5 +49,12 @@ print('Start predicting...')
 y_pred = []
 for x in X_test:
     y_pred.append(gbt.predict(x, num_iteration=gbt.best_iteration))
+
+i = 0
+for model in gbt.models:
+    g = Digraph('G', filename='newgraph'+ str(i) +'.gv', graph_attr={'rankdir': 'TB'})
+    print_node_with_children(model.root, g)
+    g.view()
+    i += 1
 
 print('The rmse of prediction is:', mean_squared_error(y_test, y_pred) ** 0.5)
