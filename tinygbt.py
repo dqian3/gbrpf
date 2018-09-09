@@ -1,13 +1,4 @@
 #!/usr/bin/python
-'''
-    File name: tinygbt.py
-    Author: Seong-Jin Kim
-    EMail: lancifollia@gmail.com
-    Date created: 7/15/2018
-    Reference:
-        [1] T. Chen and C. Guestrin. XGBoost: A Scalable Tree Boosting System. 2016.
-        [2] G. Ke et al. LightGBM: A Highly Efficient Gradient Boosting Decision Tree. 2017.
-'''
 
 import sys
 import time
@@ -25,6 +16,8 @@ np.random.seed(0)
 
 class Dataset(object):
     def __init__(self, X, y):
+        # Some attempts to normalize data, made thins worse
+
         # for i in range(X.shape[1]): # iterate through feature columns
         #     feat_sum = 0
         #     for j in range(X.shape[0]): # iterate through rows
@@ -67,7 +60,6 @@ class TreeNode(object):
     def _calc_split_gain(self, G, H, G_l, H_l, G_r, H_r, lambd):
         """
         Loss reduction
-        (Refer to Eq7 of Reference[1])
         """
         def calc_term(g, h):
             return np.square(g) / (h + lambd)
@@ -76,7 +68,6 @@ class TreeNode(object):
     def _calc_leaf_weight(self, grad, hessian, lambd):
         """
         Calculate the optimal weight of this leaf node.
-        (Refer to Eq5 of Reference[1])
         """
         return np.sum(grad) / (np.sum(hessian) + lambd)
 
@@ -86,7 +77,6 @@ class TreeNode(object):
     def build(self, instances, grad, hessian, shrinkage_rate, depth, param):
         """
         Exact Greedy Alogirithm for Split Finidng
-        (Refer to Algorithm1 of Reference[1])
         """
         assert instances.shape[0] == len(grad) == len(hessian)
         if depth > param['max_depth']:
@@ -113,7 +103,6 @@ class TreeNode(object):
             dot_products = np.array([self._calc_linear_comb(coef_vector, instance) for instance in instances])
 
             G_l, H_l = 0., 0.
-            #sorted_instance_ids = instances[:,feature_id].argsort()
             sorted_instance_ids = dot_products.argsort()
             for j in range(sorted_instance_ids.shape[0]):
                 G_l += grad[sorted_instance_ids[j]]
@@ -123,20 +112,16 @@ class TreeNode(object):
                 current_gain = self._calc_split_gain(G, H, G_l, H_l, G_r, H_r, param['lambda'])
                 if current_gain > best_gain:
                     best_gain = current_gain
-                    #best_feature_id = feature_id
                     best_coef_vector = coef_vector
                     best_val = dot_products[sorted_instance_ids[j]]
                     best_left_instance_ids = sorted_instance_ids[:j+1]
                     best_right_instance_ids = sorted_instance_ids[j+1:]
 
-        # =======================================THIS IS OUR STUFF=========================================
         # Try random linear combinations instead
-        for i in range(instances.shape[1] * 20):
+        for i in range(instances.shape[1] * 2):
             coef_vector = np.random.rand(instances.shape[1])
-            #coef_vector = np.array([round(x) for x in coef_vector])
             dot_products = np.array([self._calc_linear_comb(coef_vector, instance) for instance in instances])
             G_l, H_l = 0., 0.
-            #sorted_instance_ids = instances[:,feature_id].argsort()
             sorted_instance_ids = dot_products.argsort()
             for j in range(sorted_instance_ids.shape[0]):
 
@@ -147,13 +132,11 @@ class TreeNode(object):
                 current_gain = self._calc_split_gain(G, H, G_l, H_l, G_r, H_r, param['lambda'])
                 if current_gain > best_gain:
                     best_gain = current_gain
-                    #best_feature_id = feature_id
                     best_coef_vector = coef_vector
                     best_val = dot_products[sorted_instance_ids[j]]
                     best_left_instance_ids = sorted_instance_ids[:j+1]
                     best_right_instance_ids = sorted_instance_ids[j+1:]
 
-        # =======================================THIS IS OUR STUFF=========================================
 
         if best_gain < param['min_split_gain']:
             self.is_leaf = True

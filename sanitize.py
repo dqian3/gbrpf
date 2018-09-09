@@ -1,13 +1,15 @@
 import pandas as pd
-from sklearn.metrics import mean_squared_error
-import re
 import sys
-import numpy as np
 
-print(sys.argv)
+# Used to "sanitize"/convert the datasets into a format our regular program could use.
+# Replaces categorical data with dummy variables, missing data with placeholders,
+# and swaps rows around if necessary.
+
+# Warning: This is kind of a hacky file that we changed to fit whatever data we were
+# working with.
 
 if (len(sys.argv) != 2):
-	raise Exception('No trainset file/output provided')
+	raise Exception('No file/output provided')
 
 df = pd.read_csv(sys.argv[1], sep=',')
 
@@ -24,5 +26,4 @@ print (df)
 df = pd.get_dummies(df)
 print (df)
 
-
-df.to_csv('sanitized_train.csv', sep='\t', header=False, index=False)
+df.to_csv('sanitized_output.csv', sep='\t', header=False, index=False)

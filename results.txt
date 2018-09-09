@@ -1,3 +1,5 @@
+Some of our initial results, values are root mean square errors.
+
 tinygbt: 1.3847
 Ours: 1.3836
 

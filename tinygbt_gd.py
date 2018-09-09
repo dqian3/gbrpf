@@ -1,12 +1,7 @@
 #!/usr/bin/python
 '''
-    File name: tinygbt.py
-    Author: Seong-Jin Kim
-    EMail: lancifollia@gmail.com
-    Date created: 7/15/2018
-    Reference:
-        [1] T. Chen and C. Guestrin. XGBoost: A Scalable Tree Boosting System. 2016.
-        [2] G. Ke et al. LightGBM: A Highly Efficient Gradient Boosting Decision Tree. 2017.
+An experiment in applying Gradient Descent to the problem of finding a good
+coeffecients for our linear combination. Couldn't get it to work.
 '''
 
 import sys
@@ -26,21 +21,6 @@ np.random.seed(0)
 
 class Dataset(object):
     def __init__(self, X, y):
-        # for i in range(X.shape[1]): # iterate through feature columns
-        #     feat_sum = 0
-        #     for j in range(X.shape[0]): # iterate through rows
-        #         feat_sum += X[j][i]
-        #     feat_avg = feat_sum / X.shape[0]
-
-        #     sse = 0
-        #     for j in range(X.shape[0]):
-        #         X[j][i] -= feat_avg
-        #         sse += (X[j][i]) ** 2
-        #     mse = sse / (X.shape[0] - 1)
-        #     rmse = sse ** 0.5
-        #     for j in range(X.shape[0]):
-        #         #X[j][i] /= rmse
-        #         pass
         for i in range(X.shape[1]):
             min_feat = 9999999
             max_feat = -9999999
@@ -95,8 +75,8 @@ class TreeNode(object):
             self.is_leaf = True
             self.weight = self._calc_leaf_weight(grad, hessian, param['lambda']) * shrinkage_rate
             return
-        # G = np.sum(grad)
-        # H = np.sum(hessian)
+        G = np.sum(grad)
+        H = np.sum(hessian)
         best_gain = 0.
         best_feature_id = None
         best_coef_vector = None
@@ -124,7 +104,7 @@ class TreeNode(object):
         assert -negative_best_gain == best_gain
         best_val = dot_products[sorted_instance_ids[j]]
         best_left_instance_ids = sorted_instance_ids[:j+1]
-        best_left_instance_ids = sorted_instance_ids[:j+1]
+        best_right_instance_ids = sorted_instance_ids[j+1:]
                 
 #            G_l, H_l = 0., 0.
 #            #sorted_instance_ids = instances[:,feature_id].argsort()
@@ -189,6 +169,7 @@ class TreeNode(object):
                                    hessian[best_right_instance_ids],
                                    shrinkage_rate,
                                    depth+1, param)
+
     def f(self, coef_vector, instances, grad, hessian, shrinkage_rate, depth, param):
         return self.evaluate(coef_vector, instances, grad, hessian, shrinkage_rate, depth, param)[0]
 
