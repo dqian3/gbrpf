@@ -16,9 +16,9 @@ print (df)
 df = df.drop('ID', axis=1)
 
 df = df.fillna(df.mean())
-dropped = df.loc[:,df.columns[-1]]
-df = df.drop(df.columns[len(df.columns)-1], axis = 1)
-df.insert(0, 0, dropped)
+# dropped = df.loc[:,df.columns[-1]]
+# df = df.drop(df.columns[len(df.columns)-1], axis = 1)
+# df.insert(0, 0, dropped)
 print (df)
 
 df = pd.get_dummies(df)

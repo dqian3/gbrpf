@@ -131,7 +131,7 @@ class TreeNode(object):
 
         # =======================================THIS IS OUR STUFF=========================================
         # Try random linear combinations instead
-        for i in range(instances.shape[1] * 2):
+        for i in range(instances.shape[1] * 20):
             coef_vector = np.random.rand(instances.shape[1])
             #coef_vector = np.array([round(x) for x in coef_vector])
             dot_products = np.array([self._calc_linear_comb(coef_vector, instance) for instance in instances])
